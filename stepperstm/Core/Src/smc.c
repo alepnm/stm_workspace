@@ -64,7 +64,7 @@ bool SMC_Init ( void ){
 
 /* MCU portu, registru inicializavimas */
     HAL_GPIO_WritePin(L6470_SS_GPIO_Port, L6470_SS_Pin, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(M25AA_SS_GPIO_Port, M25AA_SS_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(M25AA_CS_GPIO_Port, M25AA_CS_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(HC165_SS_GPIO_Port, HC165_SS_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(HC165_LATCH_GPIO_Port, HC165_LATCH_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(HCCTRL_GPIO_Port, HCCTRL_Pin, GPIO_PIN_SET);
@@ -83,7 +83,7 @@ bool SMC_Init ( void ){
     }
 
 /* SPI irenginiu inicializavimas */
-    M25AA02_SetWriteStatus( DISABLE );
+//    M25AA02_SetWriteStatus( DISABLE );
     SMC_ReadDipSwitch( );
     L6470_Init();
 

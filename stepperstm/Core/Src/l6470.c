@@ -11,7 +11,7 @@
 #define L6470_CS_LOW      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, GPIO_PIN_RESET);
 #define L6470_CS_HIGH     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, GPIO_PIN_SET);
 
-extern SPI_HandleTypeDef* hspi;
+extern SPI_HandleTypeDef* hspi1;
 extern SmcHandle_TypeDef SMC_Control;
 
 /* private functions */
@@ -498,7 +498,7 @@ static byte Xfer(byte data_tx) {
     byte data_rx;
 
     L6470_CS_LOW
-    (void)HAL_SPI_TransmitReceive(hspi, &data_tx, &data_rx, 1, 1000);
+    (void)HAL_SPI_TransmitReceive(hspi1, &data_tx, &data_rx, 1, 1000);
     L6470_CS_HIGH
 
     return data_rx;

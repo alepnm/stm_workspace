@@ -930,6 +930,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="..\Drivers\Other\25AAxx\M25AA02.h" />
+		<Unit filename="..\Drivers\Other\periph.h" />
+		<Unit filename="..\Drivers\Other\stm32f051xx.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="..\Drivers\STM32F0xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h" />
 		<Unit filename="..\Drivers\STM32F0xx_HAL_Driver\Inc\stm32_assert_template.h" />
 		<Unit filename="..\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal.h" />
@@ -1230,7 +1234,6 @@
 		<Unit filename="Core\Inc\hardware.h" />
 		<Unit filename="Core\Inc\inc_common.h" />
 		<Unit filename="Core\Inc\l6470.h" />
-		<Unit filename="Core\Inc\M25AA02.h" />
 		<Unit filename="Core\Inc\main.h" />
 		<Unit filename="Core\Inc\smc.h" />
 		<Unit filename="Core\Inc\sound.h" />
@@ -1241,9 +1244,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Core\Src\l6470.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Core\Src\M25AA02.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Core\Src\main.c">
@@ -1279,7 +1279,7 @@
 		<Extensions>
 			<code_completion />
 			<debugger>
-				<target_debugging_settings target="Release" active_interface="J-link">
+				<target_debugging_settings target="Debug" active_interface="J-link">
 					<debug_interface interface_id="J-link" ip_address="localhost" ip_port="2331" path="%Software\SEGGER\J-Link:InstallPath%" executable="JLinkGDBServer.exe" description="" dont_start_server="false" backoff_time="2000" options="0" reg_filter="0" active_family="STMicroelectronics" gdb_before_conn="" gdb_after_conn="">
 						<family_options family_id="Generic" />
 						<family_options family_id="STMicroelectronics">
@@ -1319,7 +1319,7 @@
 						</family_options>
 					</debug_interface>
 				</target_debugging_settings>
-				<target_debugging_settings target="Debug" active_interface="J-link">
+				<target_debugging_settings target="Release" active_interface="J-link">
 					<debug_interface interface_id="J-link" ip_address="localhost" ip_port="2331" path="%Software\SEGGER\J-Link:InstallPath%" executable="JLinkGDBServer.exe" description="" dont_start_server="false" backoff_time="2000" options="0" reg_filter="0" active_family="STMicroelectronics" gdb_before_conn="" gdb_after_conn="">
 						<family_options family_id="Generic" />
 						<family_options family_id="STMicroelectronics">
