@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<EmBitz_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="stepperstm/stepperstm.ebp" active="1" />
+		<Project filename="_template/template.ebp" />
+		<Project filename="stepperstm_freertos/stepperstm_freertos.ebp" />
+	</Workspace>
+</EmBitz_workspace_file>
