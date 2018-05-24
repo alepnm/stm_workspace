@@ -22,7 +22,9 @@
 #ifndef _PORT_H
 #define _PORT_H
 
+/* jai stm32 */
 #include "stm32f0xx_hal.h"
+
 
 #define	INLINE
 #ifdef __cplusplus

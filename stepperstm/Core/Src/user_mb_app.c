@@ -1,5 +1,4 @@
 #include "user_mb_app.h"
-#include "mbconfig.h"
 
 /*------------------------Slave mode use these variables----------------------*/
 
@@ -182,53 +181,3 @@ eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete ) {
 //
 //    return eStatus;
 //}
-
-
-
-
-
-/**/
-uint8_t xMbGetCoil( uint16_t usBitOffset ) {
-    return xMBUtilGetBits( ucCoilBuf, usBitOffset, 1 );
-}
-
-
-/**/
-void xMbSetCoil( uint16_t usBitOffset, uint8_t ucValue ) {
-    xMBUtilSetBits( ucCoilBuf, usBitOffset, 1, ucValue );
-}
-
-
-/**/
-uint8_t xMbGetDInput( uint16_t usBitOffset ) {
-    return xMBUtilGetBits( ucDiscInputBuf, usBitOffset, 1 );
-}
-
-
-/**/
-void xMbSetDInput( uint16_t usBitOffset, uint8_t ucValue ) {
-    xMBUtilSetBits( ucDiscInputBuf, usBitOffset, 1, ucValue );
-}
-
-
-/**/
-uint8_t xMbGetNCoils( uint16_t usBitOffset, uint8_t ucNBits ) {
-    return xMBUtilGetBits( ucCoilBuf, usBitOffset, ucNBits );
-}
-
-
-/**/
-void xMbSetNCoils( uint16_t usBitOffset, uint8_t ucNBits, uint8_t ucValue ) {
-    xMBUtilSetBits( ucCoilBuf, usBitOffset, ucNBits, ucValue );
-}
-
-/**/
-uint8_t xMbGetNDInputs( uint16_t usBitOffset, uint8_t ucNBits ) {
-    return xMBUtilGetBits( ucDiscInputBuf, usBitOffset, ucNBits );
-}
-
-
-/**/
-void xMbSetNDInputs( uint16_t usBitOffset, uint8_t ucNBits, uint8_t ucValue ) {
-    xMBUtilSetBits( ucDiscInputBuf, usBitOffset, ucNBits, ucValue );
-}

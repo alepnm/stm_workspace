@@ -23,10 +23,10 @@
 /* ----------------------- Platform includes --------------------------------*/
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mbport.h"
-#include "hardware.h"
+//#include "hardware.h"
 
 
-extern TIM_HandleTypeDef* pMbPortTimer;
+extern TIM_HandleTypeDef htim6; //port timer
 
 /* Statics */
 static USHORT usT35TimeOut50us;
@@ -40,34 +40,34 @@ xMBPortTimersInit( USHORT usTimeOut50us )
     /* backup T35 ticks */
     usT35TimeOut50us = usTimeOut50us;
 
-    pMbPortTimer->Init.Prescaler = (uint32_t)(SystemCoreClock / 48000U) - 1;
-    pMbPortTimer->Init.Period = (uint32_t)( usT35TimeOut50us - 1 );
-    pMbPortTimer->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-    pMbPortTimer->Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim6.Init.Prescaler = (uint32_t)(SystemCoreClock / 48000U) - 1;
+    htim6.Init.Period = (uint32_t)( usT35TimeOut50us - 1 );
+    htim6.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
 
-    if( HAL_TIM_Base_Init(pMbPortTimer) != HAL_OK ) return FALSE;
-    if( HAL_TIM_OnePulse_Start_IT(pMbPortTimer, TIM_CHANNEL_ALL) != HAL_OK ) return FALSE;
+    if( HAL_TIM_Base_Init(&htim6) != HAL_OK ) return FALSE;
+    if( HAL_TIM_OnePulse_Start_IT(&htim6, TIM_CHANNEL_ALL) != HAL_OK ) return FALSE;
 
-    __HAL_TIM_ENABLE_IT(pMbPortTimer, TIM_IT_UPDATE);
+    __HAL_TIM_ENABLE_IT(&htim6, TIM_IT_UPDATE);
 
     return TRUE;
 }
 
 
-inline void vMBPortTimersEnable( )
+inline void vMBPortTimersEnable( void )
 {
-    if( HW_PortTimerStart(pMbPortTimer) != true ){
-        _Error_Handler(__FILE__, __LINE__);
-    }
+    __HAL_TIM_SET_COUNTER(&htim6, 0);
+
+    if ( HAL_TIM_Base_Start(&htim6) != HAL_OK ) _Error_Handler(__FILE__, __LINE__);
+
+    __HAL_TIM_ENABLE_IT(&htim6, TIM_IT_UPDATE);
 
     //HAL_GPIO_WritePin(COOLER_GPIO_Port, COOLER_Pin, GPIO_PIN_SET);
 }
 
-inline void vMBPortTimersDisable( )
+inline void vMBPortTimersDisable( void )
 {
-    if( HAL_TIM_Base_Stop(pMbPortTimer) != HAL_OK ) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
+    if( HAL_TIM_Base_Stop(&htim6) != HAL_OK ) _Error_Handler(__FILE__, __LINE__);
 }
 
 
@@ -81,11 +81,12 @@ inline void vMBPortTimersDisable( )
 //
 //}
 
+
 void MbPortPortTimer_IRQHandler( void )
 {
-    if(__HAL_TIM_GET_FLAG(pMbPortTimer, TIM_FLAG_UPDATE) != RESET && __HAL_TIM_GET_IT_SOURCE(pMbPortTimer, TIM_IT_UPDATE) != RESET) {
+    if(__HAL_TIM_GET_FLAG(&htim6, TIM_FLAG_UPDATE) != RESET && __HAL_TIM_GET_IT_SOURCE(&htim6, TIM_IT_UPDATE) != RESET) {
 
-        __HAL_TIM_CLEAR_IT(pMbPortTimer, TIM_IT_UPDATE);
+        __HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
 
         ( void )pxMBPortCBTimerExpired( );    //prvvTIMERExpiredISR();
 

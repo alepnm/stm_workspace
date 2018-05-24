@@ -3,14 +3,10 @@
 */
 #include <stdlib.h>
 #include "M25AA02.h"
-#include "periph.h"
+#include "mcu_port.h"
 
 
 /* **************************** DEFINES, MACRO ***************************** */
-
-enum { RESULT_OK = 0x00U, RESULT_ERR, RESULT_BUSY, RESULT_TIMEOUT, RESULT_BAD_PARAM };
-
-
 
 #define M25AA02E48
 
@@ -41,8 +37,8 @@ enum { RESULT_OK = 0x00U, RESULT_ERR, RESULT_BUSY, RESULT_TIMEOUT, RESULT_BAD_PA
 #define M25AA02_STATUS_BP1                  (0x01)<<3    // bit BP1 - Block1 Protection (RW)
 
 
-#define CS_LOW          //HAL_GPIO_WritePin(M25AA_CS_GPIO_Port, M25AA_CS_Pin, GPIO_PIN_RESET);
-#define CS_HIGH         //HAL_GPIO_WritePin(M25AA_CS_GPIO_Port, M25AA_CS_Pin, GPIO_PIN_SET);
+//#define M25AA02_CS_LOW          HAL_GPIO_WritePin(M25AA_CS_GPIO_Port, M25AA_CS_Pin, GPIO_PIN_RESET);
+//#define M25AA02_CS_HIGH         HAL_GPIO_WritePin(M25AA_CS_GPIO_Port, M25AA_CS_Pin, GPIO_PIN_SET);
 
 
 /* ****************************    GLOBALS     ***************************** */
@@ -51,6 +47,7 @@ enum { RESULT_OK = 0x00U, RESULT_ERR, RESULT_BUSY, RESULT_TIMEOUT, RESULT_BAD_PA
 static uint8_t _WriteEnable( void );
 static uint8_t _WriteDisable( void );
 
+
 /* **************************** IMPLEMENTATION ***************************** */
 /* Skaitom Status Registra */
 uint8_t M25AA02_PullStatusRegister( uint8_t* status ) {
@@ -58,13 +55,13 @@ uint8_t M25AA02_PullStatusRegister( uint8_t* status ) {
     uint8_t result = RESULT_OK;
     uint8_t data_tx = (uint8_t)READ_STATUS_INSTRUCTION;
 
-    CS_LOW
+    M25AA02_CS_LOW
 
-    if( SpiTX(&data_tx, 1) != RESULT_OK || SpiRX(status, 1) != RESULT_OK ) {
+    if( SpiTransmit(&data_tx, 1) != RESULT_OK || SpiReceive(status, 1) != RESULT_OK ) {
         result = RESULT_ERR;
     }
 
-    CS_HIGH
+    M25AA02_CS_HIGH
 
     return result;
 }
@@ -78,13 +75,13 @@ uint8_t M25AA02_PushStatusRegister( uint8_t* status ) {
 
     (void)_WriteEnable();
 
-    CS_LOW
+    M25AA02_CS_LOW
 
-    if( SpiTX(&data_tx, 1) != RESULT_OK || SpiTX(status, 1) != RESULT_OK ) {
+    if( SpiTransmit(&data_tx, 1) != RESULT_OK || SpiTransmit(status, 1) != RESULT_OK ) {
         result = RESULT_ERR;
     }
 
-    CS_HIGH
+    M25AA02_CS_HIGH
 
     return result;
 }
@@ -110,22 +107,22 @@ uint8_t M25AA02_GetID( uint8_t *buffer ) {
 
     uint8_t data_tx = (uint8_t)READ_INSTRUCTION;
 
-    CS_LOW
+    M25AA02_CS_LOW
 
-    if( (result = SpiTX(&data_tx, 1) ) != RESULT_OK ) goto lp80;
+    if( (result = SpiTransmit(&data_tx, 1) ) != RESULT_OK ) goto lp80;
 
     data_tx = M25AA02_UID_NODE_ADDRESS;
 
-    if( (result = SpiTX(&data_tx, 1) ) != RESULT_OK ) goto lp80;
+    if( (result = SpiTransmit(&data_tx, 1) ) != RESULT_OK ) goto lp80;
 
 #ifdef M25AA02E48
-    result = SpiRX(buffer, 6);
+    result = SpiReceive(buffer, 6);
 #else
-    result = SpiRX(buffer, 8);
+    result = SpiReceive(buffer, 8);
 #endif
 
 lp80:
-    CS_HIGH
+    M25AA02_CS_HIGH
 
     return result;
 }
@@ -140,13 +137,13 @@ uint8_t M25AA02_Read( uint8_t addr, uint8_t* buffer, int len ) {
 
     uint8_t cmd = (uint8_t)READ_INSTRUCTION;
 
-    CS_LOW
+    M25AA02_CS_LOW
 
-    if( SpiTX(&cmd, 1) != RESULT_OK || SpiTX(&addr, 1) != RESULT_OK || SpiRX(buffer, len) != RESULT_OK ) {
+    if( SpiTransmit(&cmd, 1) != RESULT_OK || SpiTransmit(&addr, 1) != RESULT_OK || SpiReceive(buffer, len) != RESULT_OK ) {
         result = RESULT_ERR;
     }
 
-    CS_HIGH
+    M25AA02_CS_HIGH
 
     return result;
 }
@@ -173,18 +170,18 @@ uint8_t M25AA02_Write( uint8_t addr, uint8_t* buffer, uint8_t len ) {
 
             (void)_WriteEnable();
 
-            CS_LOW
+            M25AA02_CS_LOW
 
-            if( SpiTX(&cmd, 1) != RESULT_OK || SpiTX(&addr, 1) != RESULT_OK || SpiTX(buffer, wr_size) != RESULT_OK ) {
+            if( SpiTransmit(&cmd, 1) != RESULT_OK || SpiTransmit(&addr, 1) != RESULT_OK || SpiTransmit(buffer, wr_size) != RESULT_OK ) {
 
-                CS_HIGH
+                M25AA02_CS_HIGH
 
-                HAL_Delay(7);
+                Delay_ms(7);
 
                 return RESULT_ERR;
             }
 
-            CS_HIGH
+            M25AA02_CS_HIGH
 
             while( M25AA02_GetWriteFlag() != false );
 
@@ -193,7 +190,7 @@ uint8_t M25AA02_Write( uint8_t addr, uint8_t* buffer, uint8_t len ) {
             addr += wr_size;
             len -= wr_size;
 
-            HAL_Delay(7);
+            Delay_ms(7);
         }
 
         return result;
@@ -201,13 +198,13 @@ uint8_t M25AA02_Write( uint8_t addr, uint8_t* buffer, uint8_t len ) {
 
     (void)_WriteEnable();
 
-    CS_LOW
+    M25AA02_CS_LOW
 
-    if( SpiTX(&cmd, 1) != RESULT_OK || SpiTX(&addr, 1) != RESULT_OK || SpiTX(buffer, len) != RESULT_OK ) {
+    if( SpiTransmit(&cmd, 1) != RESULT_OK || SpiTransmit(&addr, 1) != RESULT_OK || SpiTransmit(buffer, len) != RESULT_OK ) {
         result = RESULT_ERR;
     }
 
-    CS_HIGH
+    M25AA02_CS_HIGH
 
     while( M25AA02_GetWriteFlag() != false );
 
@@ -251,11 +248,11 @@ static uint8_t _WriteEnable() {
     uint8_t result = RESULT_OK;
     uint8_t cmd = (uint8_t)WRITE_ENABLE_INSTRUCTION;
 
-    CS_LOW
+    M25AA02_CS_LOW
 
-    result = SpiTX(&cmd, 1);
+    result = SpiTransmit(&cmd, 1);
 
-    CS_HIGH
+    M25AA02_CS_HIGH
 
     return result;
 }
@@ -267,44 +264,12 @@ static uint8_t _WriteDisable() {
     uint8_t result = RESULT_OK;
     uint8_t cmd = (uint8_t)WRITE_DISABLE_INSTRUCTION;
 
-    CS_LOW
+    M25AA02_CS_LOW
 
-    result = SpiTX(&cmd, 1);
+    result = SpiTransmit(&cmd, 1);
 
-    CS_HIGH
+    M25AA02_CS_HIGH
 
     return result;
 }
 
-
-static bool ReadOverSPI(uint8_t* pData, uint8_t len) {
-
-
-    return false;
-}
-
-static bool WriteOverSPI(uint8_t* pData, uint8_t len) {
-
-
-    return false;
-}
-
-
-
-//inline static HAL_StatusTypeDef SpiTX(uint8_t* pData, uint8_t len) {
-//
-//    HAL_StatusTypeDef result = HAL_OK;
-//
-//    if( ( result = HAL_SPI_Transmit(phspi, pData, len, 10) )!= HAL_OK ) return result;
-//    while( phspi->State == HAL_SPI_STATE_BUSY );
-//    return HAL_OK;
-//}
-//
-//inline static HAL_StatusTypeDef SpiRX(uint8_t* pData, uint8_t len) {
-//
-//    HAL_StatusTypeDef result = HAL_OK;
-//
-//    if( ( result = HAL_SPI_Receive(phspi, pData, len, 10) ) != HAL_OK ) return result;
-//    while( phspi->State == HAL_SPI_STATE_BUSY );
-//    return HAL_OK;
-//}

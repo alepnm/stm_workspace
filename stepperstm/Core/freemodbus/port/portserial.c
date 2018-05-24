@@ -21,12 +21,14 @@
 
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mbport.h"
-#include "hardware.h"
+//#include "hardware.h"
 
 /* Externs */
 extern UART_HandleTypeDef* pMbPort;
 
 /* ----------------------- extern functions ---------------------------------*/
+extern bool UartStart( UART_HandleTypeDef* port, uint32_t ulBaudRate, uint8_t ucDataBits, uint8_t eParity );
+
 /* ----------------------- static functions ---------------------------------*/
 //static void prvvUARTTxReadyISR( void );
 //static void prvvUARTRxISR( void );
@@ -55,7 +57,7 @@ BOOL xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBPar
 {
     UNUSED(ucPORT);
 
-    if( HW_UartStart(pMbPort, (uint32_t)ulBaudRate, (uint8_t)ucDataBits, eParity) != true ){
+    if( UartStart(pMbPort, (uint32_t)ulBaudRate, (uint8_t)ucDataBits, eParity) != true ){
         _Error_Handler(__FILE__, __LINE__);
     }
 
@@ -103,30 +105,3 @@ BOOL xMBPortSerialGetByte( CHAR * pucByte )
 //    pxMBFrameCBByteReceived(  );
 //}
 
-void MbPortTransmitter_IRQHandler( void ) {
-
-    if( __HAL_UART_GET_FLAG( pMbPort, UART_FLAG_TC ) != RESET &&
-                    __HAL_UART_GET_IT_SOURCE( pMbPort, UART_IT_TC ) != RESET ) {
-
-#if( RS485_DE_HW_ENABLE == 0 )
-        SLAVE_RS485_RECEIVE_MODE;
-#endif
-        __HAL_UART_DISABLE_IT( pMbPort, UART_IT_TC );
-    }
-
-    if( __HAL_UART_GET_FLAG( pMbPort, UART_FLAG_TXE ) != RESET &&
-                    __HAL_UART_GET_IT_SOURCE( pMbPort, UART_IT_TXE ) != RESET ) {
-
-        __HAL_UART_ENABLE_IT( pMbPort, UART_IT_TC );
-
-        (void)pxMBFrameCBTransmitterEmpty();    //prvvUARTTxReadyISR( );
-    }
-
-    if( __HAL_UART_GET_FLAG( pMbPort, UART_FLAG_RXNE ) != RESET &&
-                    __HAL_UART_GET_IT_SOURCE( pMbPort, UART_IT_RXNE ) != RESET ) {
-
-        (void)pxMBFrameCBByteReceived();    //prvvUARTRxISR( );
-    }
-
-    HW_UartErrHandler(pMbPort);
-}

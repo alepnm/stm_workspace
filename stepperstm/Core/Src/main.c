@@ -41,14 +41,7 @@
 #include "stm32f0xx_hal.h"
 
 /* USER CODE BEGIN Includes */
-#include <string.h>
-#include "smc.h"
-#include "M25AA02.h"
-#include "mb.h"
-#include "mbconfig.h"
-#include "user_mb_app.h"
 
-#include "l6470.h"
 
 /* USER CODE END Includes */
 
@@ -75,12 +68,6 @@ UART_HandleTypeDef* pMbPort = &huart1;
 TIM_HandleTypeDef* pMbPortTimer = &htim6;
 TIM_HandleTypeDef* pBeeperTimer = &htim16;
 TIM_HandleTypeDef* pPwmTimer = &htim17;
-
-SmcHandle_TypeDef SMC_Control;
-SYSTIME_TypeDef SysTimers;
-
-volatile uint32_t* Timestamp = &SysTimers.CurrentTimestamp;
-uint32_t* WTime = &SysTimers.WTime_sec;
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE END PV */
@@ -154,41 +141,6 @@ int main(void)
   MX_TIM16_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-
-    if( SMC_Init( ) != true ) _Error_Handler(__FILE__, __LINE__);
-
-    memcpy(SMC_Control.StrData.pName, "STP", 3);
-    memcpy(SMC_Control.StrData.pVersion, "1.0a", 4);
-    if( M25AA02_GetID( SMC_Control.StrData.pId ) == false ) _Error_Handler(__FILE__, __LINE__);
-
-
-    if( eMBSetSlaveID( 123, TRUE, ucSlaveIdBuf, MB_FUNC_OTHER_REP_SLAVEID_BUF - 2 )  != MB_ENOERR ) _Error_Handler(__FILE__, __LINE__);
-    if( eMBInit( MB_RTU, 0x0A, 0, 19200, MB_PAR_NONE ) != MB_ENOERR ) _Error_Handler(__FILE__, __LINE__);
-    if( eMBEnable( ) != MB_ENOERR ) _Error_Handler(__FILE__, __LINE__);
-
-
-
-//    while(1){
-//        SMC_ReadDipSwitch( );
-//        HAL_Delay(100);
-//    }
-
-    SMC_Control.MotorData.RotSpeedSetting = 200;
-    SMC_Control.MotorData.RotDirSetting = CW;
-
-
-    SMC_GetMotorStatusRegister( );
-
-    SMC_MotorStart( );
-
-    SMC_GetMotorCurrentSpeed();
-
-    SMC_MotorReverse( );
-    //SMC_MotorStartParam( CCW, 20 );
-    SMC_MotorStop( );
-
-
-
 
   /* USER CODE END 2 */
 
@@ -739,6 +691,18 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+/* chekinam bodreito reiksme - ar standartine? */
+bool SMC_CheckBaudrateValue(uint16_t baudrate){
+
+    const uint32_t baudrates[6U] = { 4800U, 9600U, 19200U, 38400U, 57600U };
+    uint8_t i = 0;
+
+    while( baudrate != baudrates[i++] ) {
+        if( i >= ( sizeof(baudrates)/sizeof(baudrate) ) ) return false;
+    }
+
+    return true;
+}
 /* USER CODE END 4 */
 
 /**

@@ -930,10 +930,11 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="..\Drivers\Other\25AAxx\M25AA02.h" />
-		<Unit filename="..\Drivers\Other\periph.h" />
+		<Unit filename="..\Drivers\Other\mcu_port.h" />
 		<Unit filename="..\Drivers\Other\stm32f051xx.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="..\Drivers\Other\stm32f051xx.h" />
 		<Unit filename="..\Drivers\STM32F0xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h" />
 		<Unit filename="..\Drivers\STM32F0xx_HAL_Driver\Inc\stm32_assert_template.h" />
 		<Unit filename="..\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal.h" />
@@ -1231,37 +1232,14 @@
 		<Unit filename="Core\freemodbus\port\porttimer.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="Core\Inc\hardware.h" />
-		<Unit filename="Core\Inc\inc_common.h" />
-		<Unit filename="Core\Inc\l6470.h" />
 		<Unit filename="Core\Inc\main.h" />
-		<Unit filename="Core\Inc\smc.h" />
-		<Unit filename="Core\Inc\sound.h" />
 		<Unit filename="Core\Inc\stm32f0xx_hal_conf.h" />
 		<Unit filename="Core\Inc\stm32f0xx_it.h" />
 		<Unit filename="Core\Inc\user_mb_app.h" />
-		<Unit filename="Core\Src\hardware.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Core\Src\l6470.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="Core\Src\main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="Core\Src\motor_presets.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Core\Src\smc.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Core\Src\sound.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="Core\Src\stm32f0xx_hal_msp.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Core\Src\stm32f0xx_hal_timebase_TIM.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Core\Src\stm32f0xx_it.c">

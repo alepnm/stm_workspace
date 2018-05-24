@@ -19,6 +19,4 @@ uint8_t M25AA02_Read( uint8_t addr, uint8_t *buffer, int len );
 uint8_t M25AA02_Write( uint8_t addr, uint8_t* buffer, uint8_t len );
 uint8_t M25AA02_Clear( void );
 
-void M25AA02_Delay_ms( uint16_t);
-
 #endif // MICROCHIP_25AA02_H
