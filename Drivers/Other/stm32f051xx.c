@@ -1,112 +1,84 @@
 
 #include "stm32f051xx.h"
+#include "mcu_port.h"
 #include "port.h"
-
-enum { PARITY_NONE = 0x00U, PARITY_ODD, PARITY_EVEN };
-#define MBBAURATE_DEF 19200
 
 /* ****************************    GLOBALS     ***************************** */
 extern SPI_HandleTypeDef hspi1;
 extern UART_HandleTypeDef huart1;
 
 /* ****************************    PRIVATES    ***************************** */
-
+/* ************************** EXTERNAL FUNKCIJOS *************************** */
 extern bool CheckBaudrateValue(uint16_t baudrate);
-extern inline bool UartErr_Handler( UART_HandleTypeDef* port );
+extern bool (*pxMBFrameCBByteReceived)( void );
+extern bool (*pxMBFrameCBTransmitterEmpty)( void );
 
 
+/* ************************************************************************* */
 uint8_t SpiTransmit(uint8_t* pData, uint8_t len) {
 
-    HAL_StatusTypeDef result = HAL_OK;
+    uint8_t result = RESULT_OK;
 
     result = HAL_SPI_Transmit(&hspi1, pData, len, 10);
     while( hspi1.State == HAL_SPI_STATE_BUSY );
 
-    return (uint8_t)result;
+    return result;
 }
 
 uint8_t SpiReceive(uint8_t* pData, uint8_t len) {
 
-    HAL_StatusTypeDef result = HAL_OK;
+    uint8_t result = RESULT_OK;
 
     result = HAL_SPI_Receive(&hspi1, pData, len, 10);
     while( hspi1.State == HAL_SPI_STATE_BUSY );
 
-    return (uint8_t)result;
+    return result;
 }
 
 /* 0-NONE, 1-ODD, 2-EVEN*/
-bool UartStart( UART_HandleTypeDef* port, uint32_t ulBaudRate, uint8_t ucDataBits, uint8_t eParity ) {
+uint8_t UartStart( uint8_t uart, uint32_t ulBaudRate, uint8_t ucDataBits, uint8_t eParity ) {
 
-    if (HAL_UART_DeInit(port) != HAL_OK) return false;
+    UNUSED(uart);
 
-    if( CheckBaudrateValue(ulBaudRate) == false ) ulBaudRate = MBBAURATE_DEF;
+    if ( HAL_UART_DeInit(&huart1) != HAL_OK ) return RESULT_ERR;
 
-    port->Init.BaudRate = ulBaudRate;
+    if( CheckBaudrateValue(ulBaudRate) == false ) ulBaudRate = 19200;
 
-    if( ucDataBits == (9U) ) port->Init.WordLength = UART_WORDLENGTH_9B;
-    else port->Init.WordLength = UART_WORDLENGTH_8B;
+    huart1.Init.BaudRate = ulBaudRate;
 
-    port->Init.StopBits = UART_STOPBITS_1;
+    if( ucDataBits == (9U) ) huart1.Init.WordLength = UART_WORDLENGTH_9B;
+    else huart1.Init.WordLength = UART_WORDLENGTH_8B;
+
+    huart1.Init.StopBits = UART_STOPBITS_1;
 
     switch(eParity) {
     case PARITY_ODD:
-        port->Init.Parity = UART_PARITY_ODD;
+        huart1.Init.Parity = UART_PARITY_ODD;
         break;
     case PARITY_EVEN:
-        port->Init.Parity = UART_PARITY_EVEN;
+        huart1.Init.Parity = UART_PARITY_EVEN;
         break;
     default:
-        port->Init.Parity = UART_PARITY_NONE;
+        huart1.Init.Parity = UART_PARITY_NONE;
     }
 
-    if (HAL_UART_Init(port) != HAL_OK) return false;
+    if ( HAL_UART_Init(&huart1) != HAL_OK ) return RESULT_ERR;
 
-    return true;
+    return RESULT_OK;
 }
 
 /*  */
-bool UartStop( UART_HandleTypeDef* port ) {
+uint8_t UartStop( uint8_t uart ) {
 
-    __HAL_UART_DISABLE_IT( port, UART_IT_RXNE );
-    __HAL_UART_DISABLE_IT( port, UART_IT_TXE );
-    __HAL_UART_DISABLE_IT( port, UART_IT_TC );
+    UNUSED(uart);
 
-    if (HAL_UART_DeInit(port) != HAL_OK) return false;
+    __HAL_UART_DISABLE_IT( &huart1, UART_IT_RXNE );
+    __HAL_UART_DISABLE_IT( &huart1, UART_IT_TXE );
+    __HAL_UART_DISABLE_IT( &huart1, UART_IT_TC );
 
-    return true;
+    if ( HAL_UART_DeInit(&huart1) != HAL_OK ) return RESULT_ERR;
+
+    return RESULT_OK;
 }
-
-
-
-
-void MbPortTransmitter_IRQHandler( void ) {
-
-    if( __HAL_UART_GET_FLAG( &huart1, UART_FLAG_TC ) != RESET &&
-            __HAL_UART_GET_IT_SOURCE( &huart1, UART_IT_TC ) != RESET ) {
-
-#if( RS485_DE_HW_ENABLE == 0 )
-        SLAVE_RS485_RECEIVE_MODE;
-#endif
-        __HAL_UART_DISABLE_IT( &huart1, UART_IT_TC );
-    }
-
-    if( __HAL_UART_GET_FLAG( &huart1, UART_FLAG_TXE ) != RESET &&
-            __HAL_UART_GET_IT_SOURCE( &huart1, UART_IT_TXE ) != RESET ) {
-
-        __HAL_UART_ENABLE_IT( &huart1, UART_IT_TC );
-
-        //(void)pxMBFrameCBTransmitterEmpty();    //prvvUARTTxReadyISR( );
-    }
-
-    if( __HAL_UART_GET_FLAG( &huart1, UART_FLAG_RXNE ) != RESET &&
-            __HAL_UART_GET_IT_SOURCE( &huart1, UART_IT_RXNE ) != RESET ) {
-
-        //(void)pxMBFrameCBByteReceived();    //prvvUARTRxISR( );
-    }
-
-    UartErr_Handler(&huart1);
-}
-
 
 

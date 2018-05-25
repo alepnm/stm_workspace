@@ -106,34 +106,10 @@
 #define LO16(x) (uint16_t)( x & 0x0000FFFF )
 #define HI16(x) (uint16_t)((x & 0xFFFF0000 ) >> 16)
 
-#define __enter_critical() {uint32_t irq; irq = __get_PRIMASK();
-#define __exit_critical() __set_PRIMASK(irq);}
-#define ATOMIC_SECTION(X) __enter_critical(); {X}; __exit_critical();
-
-
 #define DUMMY  0
 
-#define LED_ON                  GPIO_PIN_RESET
-#define LED_OFF                 GPIO_PIN_SET
-
-#define STATUS_LED_ON()         HAL_GPIO_WritePin(STATUS_LED_GPIO_Port, STATUS_LED_Pin, GPIO_PIN_RESET)
-#define STATUS_LED_OFF()        HAL_GPIO_WritePin(STATUS_LED_GPIO_Port, STATUS_LED_Pin, GPIO_PIN_SET)
-#define STATUS_LED_TOGGLE()     HAL_GPIO_TogglePin(STATUS_LED_GPIO_Port, STATUS_LED_Pin)
-#define FAULT_LED_ON()          HAL_GPIO_WritePin(FAULT_LED_GPIO_Port, FAULT_LED_Pin, GPIO_PIN_RESET)
-#define FAULT_LED_OFF()         HAL_GPIO_WritePin(FAULT_LED_GPIO_Port, FAULT_LED_Pin, GPIO_PIN_SET)
-#define FAULT_LED_TOGGLE()      HAL_GPIO_TogglePin(FAULT_LED_GPIO_Port, FAULT_LED_Pin)
-
-#define COOLER_ON()             HAL_GPIO_WritePin(COOLER_GPIO_Port, COOLER_Pin, GPIO_PIN_SET)
-#define COOLER_OFF()            HAL_GPIO_WritePin(COOLER_GPIO_Port, COOLER_Pin, GPIO_PIN_RESET)
-#define RELAY_ON()              HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_SET)
-#define RELAY_OFF()             HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_RESET)
-
-#define L6470_EMERGENCY_STOP    HAL_GPIO_WritePin(L6470_RST_GPIO_Port, L6470_RST_Pin, GPIO_PIN_RESET); while(1);
-
-#define DI0_STATE()             HAL_GPIO_ReadPin(DI0_GPIO_Port, DI0_Pin)
-#define DI1_STATE()             HAL_GPIO_ReadPin(DI1_GPIO_Port, DI1_Pin)
-#define DI2_STATE()             HAL_GPIO_ReadPin(DI2_GPIO_Port, DI2_Pin)
-#define DI3_STATE()             HAL_GPIO_ReadPin(DI3_GPIO_Port, DI3_Pin)
+enum { PARITY_NONE = 0x00U, PARITY_ODD, PARITY_EVEN };
+enum { RESULT_OK = 0x00U, RESULT_ERR, RESULT_BUSY, RESULT_TIMEOUT, RESULT_BAD_PARAM };
 
 
 //0x0001

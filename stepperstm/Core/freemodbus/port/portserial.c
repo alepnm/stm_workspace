@@ -24,12 +24,12 @@
 //#include "hardware.h"
 
 /* Externs */
-extern UART_HandleTypeDef* pMbPort;
+extern UART_HandleTypeDef huart1;
 
 /* ----------------------- extern functions ---------------------------------*/
 extern bool UartStart( UART_HandleTypeDef* port, uint32_t ulBaudRate, uint8_t ucDataBits, uint8_t eParity );
-
 /* ----------------------- static functions ---------------------------------*/
+static bool UartErr_Handler( UART_HandleTypeDef* port );
 //static void prvvUARTTxReadyISR( void );
 //static void prvvUARTRxISR( void );
 
@@ -37,18 +37,18 @@ extern bool UartStart( UART_HandleTypeDef* port, uint32_t ulBaudRate, uint8_t uc
 void vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )
 {
     if( xRxEnable ) {
-        __HAL_UART_ENABLE_IT( pMbPort, UART_IT_RXNE );
+        __HAL_UART_ENABLE_IT( &huart1, UART_IT_RXNE );
     } else {
-        __HAL_UART_DISABLE_IT( pMbPort, UART_IT_RXNE );
+        __HAL_UART_DISABLE_IT( &huart1, UART_IT_RXNE );
     }
 
     if( xTxEnable ) {
 #if( RS485_DE_HW_ENABLE == 0 )
         SLAVE_RS485_SEND_MODE;
 #endif
-        __HAL_UART_ENABLE_IT( pMbPort, UART_IT_TXE );
+        __HAL_UART_ENABLE_IT( &huart1, UART_IT_TXE );
     } else {
-        __HAL_UART_DISABLE_IT( pMbPort, UART_IT_TXE );
+        __HAL_UART_DISABLE_IT( &huart1, UART_IT_TXE );
     }
 }
 
@@ -57,9 +57,7 @@ BOOL xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBPar
 {
     UNUSED(ucPORT);
 
-    if( UartStart(pMbPort, (uint32_t)ulBaudRate, (uint8_t)ucDataBits, eParity) != true ){
-        _Error_Handler(__FILE__, __LINE__);
-    }
+    if( UartStart( 0, (uint32_t)ulBaudRate, (uint8_t)ucDataBits, eParity) != RESULT_OK ) Error_Handler();
 
     vMBPortSerialEnable( TRUE, FALSE );
 
@@ -69,7 +67,7 @@ BOOL xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBPar
 /*  */
 BOOL xMBPortSerialPutByte( CHAR ucByte )
 {
-    pMbPort->Instance->TDR = ucByte;
+    huart1.Instance->TDR = ucByte;
 
     return TRUE;
 }
@@ -77,7 +75,7 @@ BOOL xMBPortSerialPutByte( CHAR ucByte )
 /*  */
 BOOL xMBPortSerialGetByte( CHAR * pucByte )
 {
-    *pucByte = pMbPort->Instance->RDR;
+    *pucByte = huart1.Instance->RDR;
 
     return TRUE;
 }
@@ -105,3 +103,60 @@ BOOL xMBPortSerialGetByte( CHAR * pucByte )
 //    pxMBFrameCBByteReceived(  );
 //}
 
+void MbPortTransmitter_IRQHandler( void ) {
+
+    if( __HAL_UART_GET_FLAG( &huart1, UART_FLAG_TC ) != RESET &&
+            __HAL_UART_GET_IT_SOURCE( &huart1, UART_IT_TC ) != RESET ) {
+
+#if( RS485_DE_HW_ENABLE == 0 )
+        SLAVE_RS485_RECEIVE_MODE;
+#endif
+        __HAL_UART_DISABLE_IT( &huart1, UART_IT_TC );
+    }
+
+    if( __HAL_UART_GET_FLAG( &huart1, UART_FLAG_TXE ) != RESET &&
+            __HAL_UART_GET_IT_SOURCE( &huart1, UART_IT_TXE ) != RESET ) {
+
+        __HAL_UART_ENABLE_IT( &huart1, UART_IT_TC );
+
+        (void)pxMBFrameCBTransmitterEmpty();    //prvvUARTTxReadyISR( );
+    }
+
+    if( __HAL_UART_GET_FLAG( &huart1, UART_FLAG_RXNE ) != RESET &&
+            __HAL_UART_GET_IT_SOURCE( &huart1, UART_IT_RXNE ) != RESET ) {
+
+        (void)pxMBFrameCBByteReceived();    //prvvUARTRxISR( );
+    }
+
+    UartErr_Handler(&huart1);
+}
+
+
+INLINE bool UartErr_Handler( UART_HandleTypeDef* port ) {
+
+    if( __HAL_UART_GET_FLAG(port, UART_FLAG_PE) != RESET &&
+            __HAL_UART_GET_IT_SOURCE(port, UART_IT_PE) != RESET ) {
+        __HAL_UART_CLEAR_PEFLAG(port);
+
+        port->ErrorCode |= HAL_UART_ERROR_PE;
+    }
+
+    if( __HAL_UART_GET_IT_SOURCE(port, UART_IT_ERR) != RESET ) {
+        if( __HAL_UART_GET_FLAG(port, UART_FLAG_FE) != RESET ) {
+            __HAL_UART_CLEAR_FEFLAG(port);
+            port->ErrorCode |= HAL_UART_ERROR_FE;
+        }
+
+        if( __HAL_UART_GET_FLAG(port, UART_FLAG_NE) != RESET ) {
+            __HAL_UART_CLEAR_NEFLAG(port);
+            port->ErrorCode |= HAL_UART_ERROR_NE;
+        }
+
+        if( __HAL_UART_GET_FLAG(port, UART_FLAG_ORE) != RESET ) {
+            __HAL_UART_CLEAR_OREFLAG(port);
+            port->ErrorCode |= HAL_UART_ERROR_ORE;
+        }
+    }
+
+    return true;
+}

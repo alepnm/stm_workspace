@@ -88,9 +88,6 @@ static void MX_SPI1_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
-
-
-
 /* USER CODE BEGIN PFP */
 /* -----------------------------Extern functions ---------------------------- */
 /* ------------------------ Private function prototypes ----------------------*/
@@ -692,7 +689,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* chekinam bodreito reiksme - ar standartine? */
-bool SMC_CheckBaudrateValue(uint16_t baudrate){
+bool CheckBaudrateValue(uint16_t baudrate){
 
     const uint32_t baudrates[6U] = { 4800U, 9600U, 19200U, 38400U, 57600U };
     uint8_t i = 0;
