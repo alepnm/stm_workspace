@@ -5,12 +5,15 @@
 
 #define Delay_ms(x) HAL_Delay(x)
 
+#define L6470_CS_LOW            HAL_GPIO_WritePin(L6470_CS_GPIO_Port, L6470_CS_Pin, GPIO_PIN_RESET);
+#define L6470_CS_HIGH           HAL_GPIO_WritePin(L6470_CS_GPIO_Port, L6470_CS_Pin, GPIO_PIN_SET);
+
 #define M25AA02_CS_LOW          HAL_GPIO_WritePin(M25AA_CS_GPIO_Port, M25AA_CS_Pin, GPIO_PIN_RESET);
 #define M25AA02_CS_HIGH         HAL_GPIO_WritePin(M25AA_CS_GPIO_Port, M25AA_CS_Pin, GPIO_PIN_SET);
 
 uint8_t SpiTransmit(uint8_t* pData, uint8_t len);
 uint8_t SpiReceive(uint8_t* pData, uint8_t len);
-
+uint8_t SpiTransmitReceive(uint8_t* pDataTx, uint8_t* pDataRx, uint8_t len);
 
 
 

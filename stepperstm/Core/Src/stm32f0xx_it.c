@@ -148,7 +148,11 @@ void EXTI2_3_IRQHandler(void)
 void TIM6_DAC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
-    MbPortPortTimer_IRQHandler();
+    if(__HAL_TIM_GET_FLAG(&htim6, TIM_FLAG_UPDATE) != RESET && __HAL_TIM_GET_IT_SOURCE(&htim6, TIM_IT_UPDATE) != RESET)
+    {
+        __HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
+        MbPortPortTimer_IRQHandler();
+    }
   /* USER CODE END TIM6_DAC_IRQn 0 */
   HAL_TIM_IRQHandler(&htim6);
   HAL_DAC_IRQHandler(&hdac1);

@@ -19,8 +19,12 @@ uint8_t SpiTransmit(uint8_t* pData, uint8_t len) {
 
     HAL_StatusTypeDef result = HAL_OK;
 
+    L6470_CS_LOW
+
     result = HAL_SPI_Transmit(&hspi1, pData, len, 10);
     while( hspi1.State == HAL_SPI_STATE_BUSY );
+
+    L6470_CS_HIGH
 
     return (uint8_t)result;
 }
@@ -29,11 +33,31 @@ uint8_t SpiReceive(uint8_t* pData, uint8_t len) {
 
     HAL_StatusTypeDef result = HAL_OK;
 
+    L6470_CS_LOW
+
     result = HAL_SPI_Receive(&hspi1, pData, len, 10);
     while( hspi1.State == HAL_SPI_STATE_BUSY );
 
+    L6470_CS_HIGH
+
     return (uint8_t)result;
 }
+
+uint8_t SpiTransmitReceive(uint8_t* pDataTx, uint8_t* pDataRx, uint8_t len) {
+
+    HAL_StatusTypeDef result = HAL_OK;
+
+    L6470_CS_LOW
+
+    result = HAL_SPI_TransmitReceive(&hspi1, pDataTx, pDataRx, len, 10);
+    while( hspi1.State == HAL_SPI_STATE_BUSY );
+
+    L6470_CS_HIGH
+
+    return (uint8_t)result;
+}
+
+
 
 /* 0-NONE, 1-ODD, 2-EVEN*/
 bool UartStart( UART_HandleTypeDef* port, uint32_t ulBaudRate, uint8_t ucDataBits, uint8_t eParity ) {

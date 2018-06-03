@@ -72,12 +72,12 @@
 #define DI2_GPIO_Port GPIOB
 #define L6470_RST_Pin GPIO_PIN_10
 #define L6470_RST_GPIO_Port GPIOB
-#define L6470_SS_Pin GPIO_PIN_11
-#define L6470_SS_GPIO_Port GPIOB
+#define L6470_CS_Pin GPIO_PIN_11
+#define L6470_CS_GPIO_Port GPIOB
 #define M25AA_CS_Pin GPIO_PIN_12
 #define M25AA_CS_GPIO_Port GPIOB
-#define HC165_SS_Pin GPIO_PIN_13
-#define HC165_SS_GPIO_Port GPIOB
+#define HC165_CS_Pin GPIO_PIN_13
+#define HC165_CS_GPIO_Port GPIOB
 #define STATUS_LED_Pin GPIO_PIN_14
 #define STATUS_LED_GPIO_Port GPIOB
 #define FAULT_LED_Pin GPIO_PIN_15
@@ -111,7 +111,7 @@
 #define ATOMIC_SECTION(X) __enter_critical(); {X}; __exit_critical();
 
 
-#define DUMMY  0
+#define DUMMY                   (0U)
 
 #define LED_ON                  GPIO_PIN_RESET
 #define LED_OFF                 GPIO_PIN_SET
@@ -136,24 +136,45 @@
 #define DI3_STATE()             HAL_GPIO_ReadPin(DI3_GPIO_Port, DI3_Pin)
 
 
-//0x0001
-//0x0002
-//0x0004
-#define FLT_SW_MODBUS		    ( 0x0008U ) /* 3 bitas modbus steko klaida */
-#define FLT_HW_HS			    ( 0x0010U ) /* 4 bitas  holo daviklio klaida */
-#define FLT_HW_VBUS             ( 0x0020U ) /* 5 bitas  nera draiverio maitinimo VBUS */
-#define FLT_HW_VBUS_LOW         ( 0x0040U ) /* 6 bitas  VBUS reiksme uz diapazono ribu */
-#define FLT_HW_VBUS_HIGH        ( 0x0080U ) /* 7 bitas VBUS reiksme uz diapazono ribu */
-//#define FLT_HW_OVERHEAT         ( 0x0100U ) /* 8 bitas draiverio perkaitimas. Signalas imamas is isorinio termodaviklio. Bus realizuota ateity */
-#define FLT_HW_ULVO             ( 0x0200U ) /* 9 bitas zema draiverio itampa */
-#define FLT_HW_OCD              ( 0x0400U ) /* 10 bitas overcurrent */
-#define FLT_HW_TH_WRN           ( 0x0800U ) /* 11 bitas darbas uzblokuotas po perkaitimo */
-#define FLT_HW_TH_SHUTDOWN      ( 0x1000U ) /* 11 bitas darbas uzblokuotas po perkaitimo. Aktyvuojamas, kai gaunama is draiverio, numetam praejus tam tikra laika (OverheatStopTimer) */
-#define FLT_HW_MOTOR            ( 0x2000U ) /* 12 bitas variklio klaida - nediagnostuojamas overcurrent */
 
 
+/* VBUS kontrole */
+#define FLT_HW_VBUS_Pos         (3U)
+#define FLT_HW_VBUS_Msk         (0x03U << FLT_HW_VBUS_Pos)
+#define FLT_HW_VBUS             FLT_HW_VBUS_Msk
+#define FLT_HW_VBUS_LOW         (0x01U << FLT_HW_VBUS_Pos)
+#define FLT_HW_VBUS_HIGH        (0x02U << FLT_HW_VBUS_Pos)
 
-//typedef enum{ CCW = 0, CW = !CCW }DIR_TypeDef;
+/* variklis */
+#define FLT_HW_MOTOR_Pos        (5U)
+#define FLT_HW_MOTOR_Msk        (0x01U << FLT_HW_MOTOR_Pos)
+#define FLT_HW_MOTOR            FLT_HW_MOTOR_Msk
+
+/* holo daviklis */
+#define FLT_HW_HS_Pos           (6U)
+#define FLT_HW_HS_Msk           (0x01U << FLT_HW_HS_Pos)
+#define FLT_HW_HS               FLT_HW_HS_Msk
+
+/* L6470 STATUS register TH_WRN flagas */
+#define FLT_HW_TH_WRN_Pos       (7U)
+#define FLT_HW_TH_WRN_Msk       (0x01U << FLT_HW_TH_WRN_Pos)
+#define FLT_HW_TH_WRN           FLT_HW_TH_WRN_Msk
+
+/* L6470 STATUS register TH_SD flagas  */
+#define FLT_HW_TH_SHUTDOWN_Pos  (8U)
+#define FLT_HW_TH_SHUTDOWN_Msk  (0x01U << FLT_HW_TH_SHUTDOWN_Pos)
+#define FLT_HW_TH_SHUTDOWN      FLT_HW_TH_SHUTDOWN_Msk
+
+/* L6470 STATUS register OCD flagas */
+#define FLT_HW_OCD_Pos          (9U)
+#define FLT_HW_OCD_Msk          (0x01U << FLT_HW_OCD_Pos)
+#define FLT_HW_OCD              FLT_HW_OCD_Msk
+
+/* L6470 STATUS register ULVO flagas */
+#define FLT_HW_ULVO_Pos         (10U)
+#define FLT_HW_ULVO_Msk         (0x01U << FLT_HW_ULVO_Pos)
+#define FLT_HW_ULVO             FLT_HW_ULVO_Msk
+
 
 typedef struct{
     __IO uint32_t       CurrentTimestamp;

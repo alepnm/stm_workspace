@@ -926,10 +926,6 @@
 		<Unit filename="..\Drivers\CMSIS\Include\core_cmSimd.h" />
 		<Unit filename="..\Drivers\CMSIS\Include\core_sc000.h" />
 		<Unit filename="..\Drivers\CMSIS\Include\core_sc300.h" />
-		<Unit filename="..\Drivers\Other\25AAxx\M25AA02.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="..\Drivers\Other\25AAxx\M25AA02.h" />
 		<Unit filename="..\Drivers\Other\mcu_port.h" />
 		<Unit filename="..\Drivers\Other\stm32f051xx.c">
 			<Option compilerVar="CC" />
@@ -1236,6 +1232,14 @@
 		<Unit filename="Core\Inc\stm32f0xx_hal_conf.h" />
 		<Unit filename="Core\Inc\stm32f0xx_it.h" />
 		<Unit filename="Core\Inc\user_mb_app.h" />
+		<Unit filename="Core\libs\l6470\l6470.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Core\libs\l6470\l6470.h" />
+		<Unit filename="Core\libs\M25AA02\M25AA02.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Core\libs\M25AA02\M25AA02.h" />
 		<Unit filename="Core\Src\main.c">
 			<Option compilerVar="CC" />
 		</Unit>

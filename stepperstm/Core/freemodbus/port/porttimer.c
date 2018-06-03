@@ -84,12 +84,7 @@ inline void vMBPortTimersDisable( void )
 
 void MbPortPortTimer_IRQHandler( void )
 {
-    if(__HAL_TIM_GET_FLAG(&htim6, TIM_FLAG_UPDATE) != RESET && __HAL_TIM_GET_IT_SOURCE(&htim6, TIM_IT_UPDATE) != RESET) {
+    ( void )pxMBPortCBTimerExpired( );    //prvvTIMERExpiredISR();
 
-        __HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
-
-        ( void )pxMBPortCBTimerExpired( );    //prvvTIMERExpiredISR();
-
-        //HAL_GPIO_WritePin(COOLER_GPIO_Port, COOLER_Pin, GPIO_PIN_RESET);
-    }
+    //HAL_GPIO_WritePin(COOLER_GPIO_Port, COOLER_Pin, GPIO_PIN_RESET);
 }
