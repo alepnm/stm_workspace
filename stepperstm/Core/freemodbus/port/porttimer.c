@@ -23,7 +23,6 @@
 /* ----------------------- Platform includes --------------------------------*/
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mbport.h"
-//#include "hardware.h"
 
 
 extern TIM_HandleTypeDef htim6; //port timer
@@ -58,7 +57,7 @@ inline void vMBPortTimersEnable( void )
 {
     __HAL_TIM_SET_COUNTER(&htim6, 0);
 
-    if ( HAL_TIM_Base_Start(&htim6) != HAL_OK ) _Error_Handler(__FILE__, __LINE__);
+    if ( HAL_TIM_Base_Start(&htim6) != HAL_OK ) Error_Handler();
 
     __HAL_TIM_ENABLE_IT(&htim6, TIM_IT_UPDATE);
 
@@ -67,7 +66,9 @@ inline void vMBPortTimersEnable( void )
 
 inline void vMBPortTimersDisable( void )
 {
-    if( HAL_TIM_Base_Stop(&htim6) != HAL_OK ) _Error_Handler(__FILE__, __LINE__);
+    if( HAL_TIM_Base_Stop(&htim6) != HAL_OK ) Error_Handler();
+
+    __HAL_TIM_DISABLE_IT(&htim6, TIM_IT_UPDATE); //<-- patikrinti!
 }
 
 
